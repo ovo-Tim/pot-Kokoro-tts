@@ -1,29 +1,39 @@
 async function tts(text, lang, options = {}) {
     const { config, utils } = options;
-    const { tauriFetch } = utils;
-    let { requestPath, voice } = config;
+    const { http } = utils;
+    const { fetch, Body } = http;
+    let { requestPath, voice, speed } = config;
 
-    // 处理请求路径
+    // 处理基础路径
     if (!requestPath) {
-        requestPath = "http://localhost:8880"; // 默认本地服务地址
-    } else if (!requestPath.startsWith('http')) {
-        requestPath = 'http://' + requestPath; // 自动补全协议头
+        requestPath = "http://localhost:8880"; // 默认与 Python 示例保持一致
+    }
+    requestPath = requestPath.replace(/\/$/, ''); // 移除末尾斜杠
+
+    const endpoint = `${requestPath}/v1/audio/speech`;
+
+    // 处理语速
+    if (!speed) {
+        speed = 1.0;
     }
 
-    // 构造请求参数
-    const payload = {
-        model: "kokoro",
+    // 构建请求体
+    const requestBody = {
+        model: "kokoro",        // 固定模型名称
         input: text,
-        voice: voice || "af_bella",        // 默认语音
-        response_format: "mp3", // 默认格式
-        speed: config?.speed || 1.0        // 默认语速
+        voice: voice,
+        speed: parseFloat(speed),
+        response_format: "mp3"
     };
 
-    // 发送 POST 请求
-    const res = await tauriFetch(`${requestPath}/v1/audio/speech`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+    // 发送请求
+    const res = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: Body.json(requestBody),
+        responseType: 3          // 表示需要二进制响应
     });
 
     // 处理响应
