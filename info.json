@@ -5,5 +5,7 @@
   "display": "Kokoro",
   "homepage": "https://github.com/ovo-Tim/pot-Kokoro-tts",
   "needs": [{ "key": "requestPath", "display": "请求地址" }, { "key": "voice", "display": "音色"}, { "key": "speed", "display": "语速" }],
-  "languages": {}
+  "language": {
+    "en": "en"
+  }
 }
